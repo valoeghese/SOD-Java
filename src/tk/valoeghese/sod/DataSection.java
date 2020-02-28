@@ -8,12 +8,20 @@ import java.util.List;
  * Represents a section of SOD data.
  * @author Valoeghese
  */
-public class DataSection implements Iterable<Object> {
+public class DataSection implements BaseDataSection<Object> {
 	public DataSection() {
 		this.data = new ArrayList<>();
 	}
 
 	private final List<Object> data; 
+
+	/**
+	 * @deprecated Should only be used by the parser! Please use the type specific methods instead for writing data.
+	 */
+	@Override
+	public <T> void writeForParser(T data) {
+		this.data.add(data);
+	}
 
 	public void writeByte(byte data) {
 		this.data.add(data);
@@ -96,7 +104,13 @@ public class DataSection implements Iterable<Object> {
 	}
 
 	public <T extends Enum<?>> T readEnum(int index, T[] values) {
-		return values[(int) this.data.get(index)];
+		Integer i = (Integer) this.data.get(index);
+
+		if (i == null) {
+			return null;
+		}
+
+		return values[i];
 	}
 
 	@Override

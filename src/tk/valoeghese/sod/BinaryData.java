@@ -12,23 +12,56 @@ import java.util.Map;
 
 import tk.valoeghese.sod.exception.SODParseException;
 
-public class BinaryData implements Iterable<Map.Entry<String, DataSection>> {
+@SuppressWarnings("rawtypes")
+public class BinaryData implements Iterable<Map.Entry<String, BaseDataSection>> {
 	public BinaryData() {
 		this.sections = new HashMap<>();
 	}
 
-	private final Map<String, DataSection> sections;
+	private final Map<String, BaseDataSection> sections;
 
 	public DataSection get(String name) {
-		return this.sections.get(name);
+		return (DataSection) this.sections.get(name);
+	}
+
+	public ByteArrayDataSection getByteArray(String name) {
+		return (ByteArrayDataSection) this.sections.get(name);
+	}
+
+	public ShortArrayDataSection getShortArray(String name) {
+		return (ShortArrayDataSection) this.sections.get(name);
+	}
+
+	public IntArrayDataSection getIntArray(String name) {
+		return (IntArrayDataSection) this.sections.get(name);
+	}
+
+	public LongArrayDataSection getLongArray(String name) {
+		return (LongArrayDataSection) this.sections.get(name);
+	}
+
+	public FloatArrayDataSection getFloatArray(String name) {
+		return (FloatArrayDataSection) this.sections.get(name);
+	}
+
+	public DoubleArrayDataSection getDoubleArray(String name) {
+		return (DoubleArrayDataSection) this.sections.get(name);
+	}
+
+	public StringArrayDataSection getStringArray(String name) {
+		return (StringArrayDataSection) this.sections.get(name);
 	}
 
 	public DataSection getOrCreate(String name) {
-		return this.sections.computeIfAbsent(name, k -> new DataSection());
+		return (DataSection) this.sections.computeIfAbsent(name, k -> new DataSection());
 	}
 
-	public void put(String name, DataSection section) {
+	public void put(String name, BaseDataSection section) {
 		this.sections.put(name, section);
+	}
+
+	public boolean containsSection(String name) {
+		return this.sections.containsKey(name);
 	}
 
 	public boolean write(File file) {
@@ -42,7 +75,7 @@ public class BinaryData implements Iterable<Map.Entry<String, DataSection>> {
 	}
 
 	@Override
-	public Iterator<Map.Entry<String, DataSection>> iterator() {
+	public Iterator<Map.Entry<String, BaseDataSection>> iterator() {
 		return this.sections.entrySet().iterator();
 	}
 
