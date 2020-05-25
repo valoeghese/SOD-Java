@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import tk.valoeghese.sod.exception.SODParseException;
 
@@ -74,6 +76,12 @@ public class BinaryData implements Iterable<Map.Entry<String, BaseDataSection>> 
 		}
 	}
 
+	public void writeGzipped(File file) throws IOException {
+		try (DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file)))) {
+			Parser.write(this, dos);
+		}
+	}
+
 	@Override
 	public Iterator<Map.Entry<String, BaseDataSection>> iterator() {
 		return this.sections.entrySet().iterator();
@@ -89,9 +97,21 @@ public class BinaryData implements Iterable<Map.Entry<String, BaseDataSection>> 
 
 			return Parser.parse(dis);
 		} catch (IOException e) {
-			e.printStackTrace();
-			//throw new SODParseException("Error in parsing file " + file.toString());
-			return new BinaryData();
+			throw new SODParseException("Unhandled IOException in parsing file " + file.toString());
+		}
+	}
+
+	public static BinaryData readGzipped(File file) throws SODParseException {
+		try (DataInputStream dis = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+			long magic = dis.readLong();
+
+			if (magic != 0xA77D1E) {
+				throw new SODParseException("Not a valid GZIPPED SOD file!");
+			}
+
+			return Parser.parse(dis);
+		} catch (IOException e) {
+			throw new SODParseException("Unhandled IOException in parsing file " + file.toString());
 		}
 	}
 }
