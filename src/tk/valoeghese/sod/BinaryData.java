@@ -97,7 +97,7 @@ public class BinaryData implements Iterable<Map.Entry<String, BaseDataSection>> 
 
 			return Parser.parse(dis);
 		} catch (IOException e) {
-			throw new SODParseException("Unhandled IOException in parsing file " + file.toString());
+			throw new SODParseException("Unhandled IOException in parsing file " + file.toString(), e);
 		}
 	}
 
@@ -111,7 +111,7 @@ public class BinaryData implements Iterable<Map.Entry<String, BaseDataSection>> 
 
 			return Parser.parse(dis);
 		} catch (IOException e) {
-			throw new SODParseException("Unhandled IOException in parsing file " + file.toString());
+			throw new SODParseException("Unhandled IOException in parsing file " + file.toString(), e);
 		}
 	}
 }
