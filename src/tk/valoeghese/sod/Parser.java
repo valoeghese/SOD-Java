@@ -23,6 +23,8 @@ final class Parser {
 
 		try {
 			currentSection = dataType.createSection();
+			data.put(input.readUTF(), currentSection);
+
 			if (dataType != DataType.SECTION) {
 				arraySizeCountdown = input.readInt();
 			}
@@ -30,9 +32,8 @@ final class Parser {
 			throw new SODParseException("Data must be segregated into sections!");
 		}
 
-		data.put(input.readUTF(), currentSection);
-
 		while (input.available() > 0) {
+			//System.out.println(input.available());
 			switch (sectionType) {
 			case BYTE_ARRAY_SECTION:
 				while (arraySizeCountdown --> 0) {

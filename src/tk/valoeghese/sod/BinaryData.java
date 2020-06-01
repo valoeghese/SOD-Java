@@ -1,5 +1,7 @@
 package tk.valoeghese.sod;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -102,7 +104,21 @@ public class BinaryData implements Iterable<Map.Entry<String, BaseDataSection>> 
 	}
 
 	public static BinaryData readGzipped(File file) throws SODParseException {
-		try (DataInputStream dis = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+		try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(file))) {
+			// thanks stack overflow for having more efficient code than I probably would have written
+			ByteArrayOutputStream uncompressed = new ByteArrayOutputStream();
+			byte[] buf = new byte[0x1000];
+			int bytesRead;
+
+			// while file has not ended, copy up to 0x4000 bytes of data into a byte[] buffer
+			// and store the number of bytes read
+			while ((bytesRead = gis.read(buf, 0, buf.length)) != -1) {
+				// add to uncompressed output stream, omitting any bytes that weren't part of the read data
+				uncompressed.write(buf, 0, bytesRead);
+			}
+
+			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(uncompressed.toByteArray()));
+
 			long magic = dis.readLong();
 
 			if (magic != 0xA77D1E) {
